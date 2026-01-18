@@ -12,6 +12,7 @@ class Lagu extends Model
     protected $fillable = [
         'judul',
         'penyanyi',
+        'tahun',
         'file_audio',
     ];
 }

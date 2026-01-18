@@ -1,39 +1,57 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-xl mx-auto bg-white/5 backdrop-blur rounded-2xl shadow-xl p-8 border border-white/10">
-    <h2 class="text-xl font-semibold mb-6">Tambah Lagu</h2>
+<div class="row justify-content-center">
+    <div class="col-md-8">
 
-    <form action="{{ route('lagu.store') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
-        @csrf
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">➕ Tambah Lagu</h5>
+            </div>
 
-        <div>
-            <label class="block text-sm mb-1">Judul Lagu</label>
-            <input type="text" name="judul"
-                   class="w-full rounded-lg bg-black/40 border border-gray-600 px-4 py-2 focus:outline-none focus:ring focus:ring-indigo-600">
+            <div class="card-body">
+                <form action="{{ route('lagu.store') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+
+                    <!-- Judul Lagu -->
+                    <div class="mb-3">
+                        <label class="form-label">Judul Lagu</label>
+                        <input type="text" name="judul" class="form-control" required>
+                    </div>
+
+                    <!-- Penyanyi -->
+                    <div class="mb-3">
+                        <label class="form-label">Penyanyi</label>
+                        <input type="text" name="penyanyi" class="form-control" required>
+                    </div>
+
+                    <!-- Tahun -->
+                    <div class="mb-3">
+                        <label class="form-label">Tahun</label>
+                        <input type="number" name="tahun" class="form-control" required>
+                    </div>
+
+                    <!-- File Lagu -->
+                    <div class="mb-4">
+                        <label class="form-label">File Lagu (MP3)</label>
+                        <input type="file" name="file_audio" class="form-control" accept=".mp3" required>
+                    </div>
+
+                    <!-- Tombol -->
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ route('dashboard') }}" class="btn btn-secondary">
+                            ← Batal
+                        </a>
+
+                        <button type="submit" class="btn btn-success">
+                            💾 Simpan
+                        </button>
+                    </div>
+
+                </form>
+            </div>
         </div>
 
-        <div>
-            <label class="block text-sm mb-1">Penyanyi</label>
-            <input type="text" name="penyanyi"
-                   class="w-full rounded-lg bg-black/40 border border-gray-600 px-4 py-2">
-        </div>
-
-        <div>
-            <label class="block text-sm mb-1">File Lagu</label>
-            <input type="file" name="file_audio"
-                   class="w-full text-sm text-gray-300">
-        </div>
-
-        <div class="flex justify-end space-x-3 pt-4">
-            <a href="{{ route('lagu.index') }}"
-               class="px-4 py-2 rounded bg-gray-600 hover:bg-gray-700 text-sm">
-                Batal
-            </a>
-            <button class="px-5 py-2 rounded bg-indigo-600 hover:bg-indigo-700 text-sm font-semibold">
-                Simpan
-            </button>
-        </div>
-    </form>
+    </div>
 </div>
 @endsection
