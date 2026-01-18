@@ -4,78 +4,80 @@ namespace App\Http\Controllers;
 
 use App\Models\Lagu;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class LaguController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $lagus = Lagu::all();
-        return view('lagu.index', compact('lagus'));
+        $lagu = Lagu::latest()->paginate(5);
+        return view('lagu.index', compact('lagu'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return view('lagu.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
             'judul' => 'required',
             'penyanyi' => 'required',
-            'album' => 'nullable',
-            'tahun' => 'nullable|digits:4'
+            'file_audio' => 'nullable|mimes:mp3,wav,ogg',
         ]);
 
-        Lagu::create($request->all());
+        $filePath = null;
+        if ($request->hasFile('file_audio')) {
+            $filePath = $request->file('file_audio')->store('lagu', 'public');
+        }
 
-        return redirect()->route('lagu.index')
-            ->with('success', 'Data lagu berhasil ditambahkan');
+        Lagu::create([
+            'judul' => $request->judul,
+            'penyanyi' => $request->penyanyi,
+            'file_audio' => $filePath,
+        ]);
+
+        return redirect()->route('lagu.index')->with('success', 'Lagu berhasil ditambahkan');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Lagu $lagu)
     {
         return view('lagu.edit', compact('lagu'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Lagu $lagu)
     {
         $request->validate([
             'judul' => 'required',
             'penyanyi' => 'required',
-            'album' => 'nullable',
-            'tahun' => 'nullable|digits:4'
+            'file_audio' => 'nullable|mimes:mp3,wav,ogg',
         ]);
 
-        $lagu->update($request->all());
+        if ($request->hasFile('file_audio')) {
+            if ($lagu->file_audio) {
+                Storage::disk('public')->delete($lagu->file_audio);
+            }
 
-        return redirect()->route('lagu.index')
-            ->with('success', 'Data lagu berhasil diupdate');
+            $lagu->file_audio = $request->file('file_audio')->store('lagu', 'public');
+        }
+
+        $lagu->update([
+            'judul' => $request->judul,
+            'penyanyi' => $request->penyanyi,
+        ]);
+
+        return redirect()->route('lagu.index')->with('success', 'Lagu berhasil diperbarui');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Lagu $lagu)
     {
+        if ($lagu->file_audio) {
+            Storage::disk('public')->delete($lagu->file_audio);
+        }
+
         $lagu->delete();
 
-        return redirect()->route('lagu.index')
-            ->with('success', 'Data lagu berhasil dihapus');
+        return back()->with('success', 'Lagu berhasil dihapus');
     }
 }

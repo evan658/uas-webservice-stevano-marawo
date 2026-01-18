@@ -1,73 +1,56 @@
 @extends('layouts.app')
 
-@section('title', 'Data Lagu')
-
 @section('content')
+<div class="container">
+    <h3 class="mb-3">🎵 Daftar Lagu</h3>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h3 class="fw-bold">🎵 Data Lagu</h3>
-    <a href="{{ route('lagu.create') }}" class="btn btn-primary">
-        + Tambah Lagu
-    </a>
-</div>
+    <a href="{{ route('lagu.create') }}" class="btn btn-primary mb-3">+ Tambah Lagu</a>
 
-@if(session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
-    </div>
-@endif
+    @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
 
-<div class="card shadow-sm">
-    <div class="card-body">
-
-        <table class="table table-bordered table-hover align-middle">
-            <thead class="table-dark text-center">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Judul</th>
+                <th>Penyanyi</th>
+                <th>Audio</th>
+                <th width="160">Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse ($lagu as $item)
                 <tr>
-                    <th>No</th>
-                    <th>Judul</th>
-                    <th>Penyanyi</th>
-                    <th>Album</th>
-                    <th>Tahun</th>
-                    <th width="18%">Aksi</th>
+                    <td>{{ $item->judul }}</td>
+                    <td>{{ $item->penyanyi }}</td>
+                    <td>
+                        @if($item->file_audio)
+                            <audio controls>
+                                <source src="{{ asset('storage/'.$item->file_audio) }}">
+                            </audio>
+                        @else
+                            -
+                        @endif
+                    </td>
+                    <td>
+                        <a href="{{ route('lagu.edit', $item) }}" class="btn btn-warning btn-sm">Edit</a>
+                        <form action="{{ route('lagu.destroy', $item) }}" method="POST" class="d-inline">
+                            @csrf
+                            @method('DELETE')
+                            <button class="btn btn-danger btn-sm"
+                                onclick="return confirm('Hapus lagu?')">Hapus</button>
+                        </form>
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                @forelse ($lagus as $index => $lagu)
-                    <tr>
-                        <td class="text-center">{{ $index + 1 }}</td>
-                        <td>{{ $lagu->judul }}</td>
-                        <td>{{ $lagu->penyanyi }}</td>
-                        <td>{{ $lagu->album ?? '-' }}</td>
-                        <td class="text-center">{{ $lagu->tahun ?? '-' }}</td>
-                        <td class="text-center">
-                            <a href="{{ route('lagu.edit', $lagu->id) }}"
-                               class="btn btn-sm btn-warning text-dark">
-                                ✏️ Edit
-                            </a>
+            @empty
+                <tr>
+                    <td colspan="4" class="text-center">Data lagu kosong</td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
 
-                            <form action="{{ route('lagu.destroy', $lagu->id) }}"
-                                  method="POST"
-                                  class="d-inline">
-                                @csrf
-                                @method('DELETE')
-                                <button class="btn btn-sm btn-danger"
-                                        onclick="return confirm('Yakin ingin menghapus lagu ini?')">
-                                    🗑 Hapus
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="6" class="text-center text-muted">
-                            Data lagu belum tersedia
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-
-    </div>
+    {{ $lagu->links() }}
 </div>
-
 @endsection

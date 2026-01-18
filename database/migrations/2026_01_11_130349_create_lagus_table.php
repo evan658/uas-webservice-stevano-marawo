@@ -15,8 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('judul');
             $table->string('penyanyi');
-            $table->string('album')->nullable();
-            $table->year('tahun')->nullable();
+            $table->string('file_audio')->nullable();
             $table->timestamps();
         });
     }
